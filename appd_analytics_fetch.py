@@ -2,7 +2,11 @@ import requests
 import json
 import time
 import urllib
+from datetime import datetime
 
+def generate_epoch(delta):
+    """Generates the current epoch timestamp."""
+    return int((time.time()- delta) * 1000)
 
 # controller account name
 ACCOUNT_NAME = ''
@@ -24,7 +28,7 @@ url = baseurl+'&mode=scroll'
 
 # r = requests.post(baseurl, headers=headers,
 #                   data=
-#                   """[{"query":"SELECT * FROM web_session_records WHERE appkey = '"}]""")
+#                   """[{"query":"SELECT * FROM web_session_records WHERE appkey = 'AD-AAB-ADB-HMK"}]""")
 # pp(json.loads(r.content))
 
 scroll_id = None
@@ -38,12 +42,30 @@ while more_data and (i < MAX_ITER):
         scroll_url = url + '&' + urllib.urlencode({'scrollid': scroll_id})
     r = requests.post(scroll_url, headers=headers,
                   data=
-                  """[{"query":"SELECT * FROM web_session_records WHERE appkey = ''"}]""")
+                  """[{"query":"SELECT sessionguid, browserRecords, browser, deviceos, userdata.email, userdata.fullName, userdata.organizationId FROM web_session_records WHERE appkey = ''"}]""")
 
-   
+    #print(json.loads(r.content))
     output_json = json.loads(r.content)[0]
+    
     results = output_json["results"]
-    print(results)
+    print("Session GUID", "Browser Page", "StartTime", "EndTime", "PageType")
+    for result in results:
+        sessionGuid = result[0]
+        browserRecords = result[1]
+        browser = result[2]
+        deviceOS = result[3]
+        email = result[4]
+        fullName = result[5]
+        orgid = result[6]
+
+        for record in browserRecords:
+            page = record[8]
+            pageType = record[9]
+            endTime = datetime.fromtimestamp(record[1]/1000)
+            startTime = datetime.fromtimestamp(record[2]/1000)
+            print(browser + " ," + deviceOS + " ," + email + " ," + fullName + " ," + orgid + " ," + str(startTime) + ", " + str(endTime) + ", " + page + ", " + pageType)
+        print("#################")
+    
     more_data = output_json['moreData']
     #print("{} - moreData - ".format(output_json['moreData']))
     #print("{} - total - ".format(output_json['total']))
