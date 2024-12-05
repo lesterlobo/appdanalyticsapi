@@ -63,7 +63,7 @@ while more_data and (i < MAX_ITER):
             pageType = record[9]
             endTime = datetime.fromtimestamp(record[1]/1000)
             startTime = datetime.fromtimestamp(record[2]/1000)
-            print(browser + " ," + deviceOS + " ," + email + " ," + fullName + " ," + orgid + " ," + str(startTime) + ", " + str(endTime) + ", " + page + ", " + pageType)
+            print(browser + " ," + deviceOS + " ," + (email or " ")+ " ," + (fullName or " ") + " ," + (orgid or " ") + " ," + str(startTime) + ", " + str(endTime) + ", " + page + ", " + pageType)
         print("#################")
     
     more_data = output_json['moreData']
